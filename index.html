@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Services Pay Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 32px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        .input-section, .output-section {
+            display: grid;
+            gap: 16px;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .input-group label {
+            font-weight: 500;
+            color: #333;
+        }
+        .input-group input[type="number"], .input-group select {
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+            background-color: #ffffff; /* Ensure select has white background */
+        }
+        .input-group input[type="number"]:focus, .input-group select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+        }
+        .input-group.checkbox-group {
+            flex-direction: row;
+            align-items: center;
+            gap: 10px;
+        }
+        .input-group.checkbox-group input[type="checkbox"] {
+            width: auto;
+            height: auto;
+            margin: 0;
+            padding: 0;
+            border-radius: 4px;
+            border: 1px solid #d1d5db;
+            transform: scale(1.2);
+        }
+        .day-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+        }
+        .day-card {
+            background-color: #f9fafb;
+            padding: 16px;
+            border-radius: 10px;
+            border: 1px solid #e5e7eb;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .day-card label {
+            font-weight: 600;
+            color: #4b5563;
+            margin-bottom: 4px;
+        }
+        .day-card input {
+            width: 100%;
+        }
+        .button-group {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .btn-primary {
+            background-color: #3b82f6;
+            color: #ffffff;
+        }
+        .btn-primary:hover {
+            background-color: #2563eb;
+            transform: translateY(-1px);
+        }
+        .btn-secondary {
+            background-color: #e5e7eb;
+            color: #374151;
+        }
+        .btn-secondary:hover {
+            background-color: #d1d5db;
+            transform: translateY(-1px);
+        }
+        .output-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+        .output-item {
+            background-color: #f9fafb;
+            padding: 16px;
+            border-radius: 10px;
+            border: 1px solid #e5e7eb;
+        }
+        .output-item h3 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #4b5563;
+            margin-bottom: 6px;
+        }
+        .output-item p {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1f2937;
+        }
+        .disclaimer {
+            font-size: 0.85rem;
+            color: #6b7280;
+            margin-top: 20px;
+            padding: 12px;
+            background-color: #fffbeb;
+            border: 1px solid #fcd34d;
+            border-radius: 8px;
+        }
+
+        /* Responsive adjustments */
+        @media (min-width: 768px) {
+            .input-section {
+                grid-template-columns: 1fr 1fr;
+            }
+            .output-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Community Services Pay Calculator</h1>
+
+        <div class="input-section">
+            <div class="input-group">
+                <label for="gradeSelect">Select Grade/Classification:</label>
+                <select id="gradeSelect">
+                    <option value="custom">Custom Rate</option>
+                    <option value="level2">Social & Community Services Employee Level 2</option>
+                    <option value="level3">Social & Community Services Employee Level 3</option>
+                    <option value="level4">Social & Community Services Employee Level 4</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label for="hourlyRate">Base Hourly Rate ($):</label>
+                <input type="number" id="hourlyRate" value="25.00" step="0.01" min="0">
+            </div>
+            <div class="input-group checkbox-group">
+                <input type="checkbox" id="taxFreeThreshold" checked>
+                <label for="taxFreeThreshold">Claim Tax-Free Threshold?</label>
+            </div>
+            <div class="input-group">
+                <label for="icareRate">Estimated ICARE Rate (Employer Cost, % of Gross):</label>
+                <input type="number" id="icareRate" value="1.5" step="0.1" min="0" max="100">
+            </div>
+            <div class="input-group">
+                <label for="sleepoverAllowance">Sleepover Allowance (per instance):</label>
+                <input type="number" id="sleepoverAllowance" value="56.00" step="0.01" min="0">
+            </div>
+        </div>
+
+        <h2 class="text-xl font-semibold text-gray-700 mt-4 mb-2">Hours Worked Per Day (Fortnightly)</h2>
+        <div class="day-inputs">
+            <!-- Monday -->
+            <div class="day-card">
+                <label>Monday</label>
+                <input type="number" id="monNormal" placeholder="Normal Hrs" value="0" step="0.5" min="0">
+                <input type="number" id="monAfternoon" placeholder="Afternoon Hrs" value="0" step="0.5" min="0">
+                <input type="number" id="monNight" placeholder="Night Hrs" value="0" step="0.5" min="0">
+                <input type="number" id="monSleepover" placeholder="Sleepovers" value="0" step="1" min="0">
+            </div>
+            <!-- Tuesday -->
+            <div class="day-card">
+                <label>Tuesday</label>
+                <input type="number" id="tueNormal" placeholder="Normal Hrs" value="0" step="0.5" min="0">
+                <input type="number" id="tueAfternoon" placeholder="Afternoon Hrs" value="0" step="0.5" min="0">
+                <input type="number" id="tueNight" placeholder="Night Hrs" value="0" step="0.5" min="0">
+                <input type="number" id="tueSleepover" placeholder="Sleepovers" value="0" step="1" min="0">
+            </div>
+            <!-- Wednesday -->
+            <div class="day-card">
+                <label>Wednesday</label>
+                <input type="number" id="wedNormal" placeholder="Normal Hrs" value="0" step="0.5" min="0">
+                <input type="number" id="wedAfternoon" placeholder="Afternoon Hrs" value="0" step="0.5" min="0">
+                <input type="number" id="wedNight" placeholder="Night Hrs" value="0" step="0.5" min="0">
+                <input type="number" id="wedSleepover" placeholder="Sleepovers" value="0" step="1" min="0">
+            </div>
+            <!-- Thursday -->
+            <div class="day-card">
+                <label>Thursday</label>
+                <input type="number" id="thuNormal" placeholder="Normal Hrs" value="0" step="0.5" min="0">
+                <input type="number" id="thuAfternoon" placeholder="Afternoon Hrs" value="0" step="0.5" min="0">
+                <input type="number" id="thuNight" placeholder="Night Hrs" value="0" step="0.5" min="0">
+                <input type="number" id="thuSleepover" placeholder="Sleepovers" value="0" step="1" min="0">
+            </div>
+            <!-- Friday -->
+            <div class="day-card">
+                <label>Friday</label>
+                <input type="number" id="friNormal" placeholder="Normal Hrs" value="0" step="0.5" min="0">
+                <input type="number" id="friAfternoon" placeholder="Afternoon Hrs" value="0" step="0.5" min="0">
+                <input type="number" id="friNight" placeholder="Night Hrs" value="0" step="0.5" min="0">
+                <input type="number" id="friSleepover" placeholder="Sleepovers" value="0" step="1" min="0">
+            </div>
+            <!-- Saturday -->
+            <div class="day-card">
+                <label>Saturday</label>
+                <input type="number" id="satHours" placeholder="Saturday Hrs" value="0" step="0.5" min="0">
+                <input type="number" id="satSleepover" placeholder="Sleepovers" value="0" step="1" min="0">
+            </div>
+            <!-- Sunday -->
+            <div class="day-card">
+                <label>Sunday</label>
+                <input type="number" id="sunHours" placeholder="Sunday Hrs" value="0" step="0.5" min="0">
+                <input type="number" id="sunSleepover" placeholder="Sleepovers" value="0" step="1" min="0">
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button id="calculateBtn" class="btn btn-primary">Calculate Pay</button>
+            <button id="clearBtn" class="btn btn-secondary">Clear</button>
+        </div>
+
+        <div class="output-section mt-8">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4">Fortnightly Statistics</h2>
+            <div class="output-grid">
+                <div class="output-item">
+                    <h3>Fortnightly Gross Pay</h3>
+                    <p id="fortnightlyGrossPay">$0.00</p>
+                </div>
+                <div class="output-item">
+                    <h3>Fortnightly Tax</h3>
+                    <p id="fortnightlyTax">$0.00</p>
+                </div>
+                <div class="output-item">
+                    <h3>Fortnightly Superannuation</h3>
+                    <p id="fortnightlySuper">$0.00</p>
+                </div>
+                <div class="output-item">
+                    <h3>Fortnightly Net Pay</h3>
+                    <p id="fortnightlyNetPay">$0.00</p>
+                </div>
+                <div class="output-item">
+                    <h3>Fortnightly ICARE (Employer Cost)</h3>
+                    <p id="fortnightlyIcare">$0.00</p>
+                </div>
+                <div class="output-item">
+                    <h3>Total Employer Cost</h3>
+                    <p id="totalEmployerCost">$0.00</p>
+                </div>
+                <div class="output-item">
+                    <h3>Accrued Annual Leave (Hrs/Fortnight)</h3>
+                    <p id="annualLeaveAccrual">0.00</p>
+                </div>
+                <div class="output-item">
+                    <h3>Accrued Annual Leave Cost</h3>
+                    <p id="annualLeaveCost">$0.00</p>
+                </div>
+                <div class="output-item">
+                    <h3>Accrued Sick Leave (Hrs/Fortnight)</h3>
+                    <p id="sickLeaveAccrual">0.00</p>
+                </div>
+            </div>
+
+            <h2 class="text-xl font-semibold text-gray-700 mt-6 mb-4">Total Rostered Hours (Fortnightly)</h2>
+            <div class="output-grid">
+                <div class="output-item">
+                    <h3>Total Normal Hours</h3>
+                    <p id="totalNormalHours">0.00</p>
+                </div>
+                <div class="output-item">
+                    <h3>Total Afternoon Hours</h3>
+                    <p id="totalAfternoonHours">0.00</p>
+                </div>
+                <div class="output-item">
+                    <h3>Total Night Hours</h3>
+                    <p id="totalNightHours">0.00</p>
+                </div>
+                <div class="output-item">
+                    <h3>Total Saturday Hours</h3>
+                    <p id="totalSaturdayHours">0.00</p>
+                </div>
+                <div class="output-item">
+                    <h3>Total Sunday Hours</h3>
+                    <p id="totalSundayHours">0.00</p>
+                </div>
+                <div class="output-item">
+                    <h3>Total Sleepovers</h3>
+                    <p id="totalSleepovers">0</p>
+                </div>
+                <div class="output-item">
+                    <h3>Total Hours Worked</h3>
+                    <p id="totalHoursWorked">0.00</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="disclaimer">
+            <strong>Disclaimer:</strong> This calculator provides an *estimation* based on common interpretations and *illustrative rates* for the Community Services and Disability Award (MA000100).
+            Actual pay and entitlements may vary based on your specific enterprise agreement, individual circumstances, tax declarations, and current award rates or legislation.
+            **Tax calculations are simplified estimations based on illustrative fortnightly tax brackets (2024-2025 financial year, without Medicare Levy or HECS/HELP).**
+            For precise PAYG tax, always refer to current ATO tax tables or consult a financial professional/payroll department, as it depends on many personal factors.
+            **Sleepover allowance is an illustrative fixed rate per instance; actual award provisions may vary.**
+            **Accrued leave costs are based on the current base hourly rate and do not account for future rate changes or leave loading.**
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const calculateBtn = document.getElementById('calculateBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const gradeSelect = document.getElementById('gradeSelect');
+            const hourlyRateInput = document.getElementById('hourlyRate');
+            const taxFreeThresholdCheckbox = document.getElementById('taxFreeThreshold');
+            const icareRateInput = document.getElementById('icareRate');
+            const sleepoverAllowanceInput = document.getElementById('sleepoverAllowance');
+
+            // Get all input fields for hours
+            const dayInputs = [
+                'monNormal', 'monAfternoon', 'monNight', 'monSleepover',
+                'tueNormal', 'tueAfternoon', 'tueNight', 'tueSleepover',
+                'wedNormal', 'wedAfternoon', 'wedNight', 'wedSleepover',
+                'thuNormal', 'thuAfternoon', 'thuNight', 'thuSleepover',
+                'friNormal', 'friAfternoon', 'friNight', 'friSleepover',
+                'satHours', 'satSleepover',
+                'sunHours', 'sunSleepover'
+            ].map(id => document.getElementById(id));
+
+            // Output elements
+            const outputElements = {
+                fortnightlyGrossPay: document.getElementById('fortnightlyGrossPay'),
+                fortnightlyTax: document.getElementById('fortnightlyTax'),
+                fortnightlySuper: document.getElementById('fortnightlySuper'),
+                fortnightlyNetPay: document.getElementById('fortnightlyNetPay'),
+                fortnightlyIcare: document.getElementById('fortnightlyIcare'),
+                totalEmployerCost: document.getElementById('totalEmployerCost'),
+                annualLeaveAccrual: document.getElementById('annualLeaveAccrual'),
+                annualLeaveCost: document.getElementById('annualLeaveCost'),
+                sickLeaveAccrual: document.getElementById('sickLeaveAccrual'),
+                totalNormalHours: document.getElementById('totalNormalHours'),
+                totalAfternoonHours: document.getElementById('totalAfternoonHours'),
+                totalNightHours: document.getElementById('totalNightHours'),
+                totalSaturdayHours: document.getElementById('totalSaturdayHours'),
+                totalSundayHours: document.getElementById('totalSundayHours'),
+                totalSleepovers: document.getElementById('totalSleepovers'),
+                totalHoursWorked: document.getElementById('totalHoursWorked')
+            };
+
+            // Award Constants (based on common interpretations of MA000100)
+            const AWARD_RATES = {
+                NORMAL_LOADING: 1.0,      // 100% of base rate
+                AFTERNOON_LOADING: 1.15,  // 15% loading
+                NIGHT_LOADING: 1.30,      // 30% loading
+                SATURDAY_LOADING: 1.50,   // 50% loading
+                SUNDAY_LOADING: 2.00      // 100% loading
+                // Sleepover allowance is handled separately as a fixed amount per instance
+            };
+
+            // Illustrative base hourly rates for different grades (These are examples and should be verified with current award)
+            const GRADE_HOURLY_RATES = {
+                'custom': 25.00, // Default for custom
+                'level2': 28.50, // Example for Social & Community Services Employee Level 2
+                'level3': 30.00, // Example for Social & Community Services Employee Level 3
+                'level4': 32.50  // Example for Social & Community Services Employee Level 4
+            };
+
+            const SUPER_RATE = 0.11; // 11% of Ordinary Time Earnings (OTE)
+            const ANNUAL_LEAVE_ACCRUAL_RATE_FULL_TIME_HOURS_PER_YEAR = 152; // 4 weeks x 38 hours
+            const SICK_LEAVE_ACCRUAL_RATE_FULL_TIME_HOURS_PER_YEAR = 76;   // 10 days x 7.6 hours (or 2 weeks x 38 hours)
+            const STANDARD_FULL_TIME_HOURS_PER_FORTNIGHT = 76; // 38 hours/week * 2 weeks
+
+            /**
+             * Calculates estimated PAYG tax based on fortnightly gross pay and tax-free threshold claim.
+             * These are illustrative brackets for 2024-2025, simplified and without Medicare Levy/HECS.
+             * @param {number} grossPay - The fortnightly gross pay.
+             * @param {boolean} claimTaxFreeThreshold - True if tax-free threshold is claimed.
+             * @returns {number} The estimated fortnightly tax.
+             */
+            function calculatePAYGTax(grossPay, claimTaxFreeThreshold) {
+                let tax = 0;
+
+                if (claimTaxFreeThreshold) {
+                    // Fortnightly tax rates with tax-free threshold (Illustrative 2024-2025)
+                    if (grossPay <= 457) {
+                        tax = 0;
+                    } else if (grossPay <= 549) {
+                        tax = (grossPay - 457) * 0.19;
+                    } else if (grossPay <= 1057) {
+                        tax = 17.48 + (grossPay - 549) * 0.325;
+                    } else if (grossPay <= 1972) {
+                        tax = 181.73 + (grossPay - 1057) * 0.37;
+                    } else {
+                        tax = 524.38 + (grossPay - 1972) * 0.45;
+                    }
+                } else {
+                    // Fortnightly tax rates without tax-free threshold (Illustrative 2024-2025)
+                    if (grossPay <= 361) {
+                        tax = 0;
+                    } else if (grossPay <= 480) {
+                        tax = (grossPay - 361) * 0.19;
+                    } else if (grossPay <= 938) {
+                        tax = 22.59 + (grossPay - 480) * 0.325;
+                    } else if (grossPay <= 1730) {
+                        tax = 171.24 + (grossPay - 938) * 0.37;
+                    } else {
+                        tax = 467.20 + (grossPay - 1730) * 0.45;
+                    }
+                }
+                return Math.max(0, tax); // Ensure tax is not negative
+            }
+
+            /**
+             * Updates the hourly rate input based on the selected grade.
+             */
+            function updateHourlyRateFromGrade() {
+                const selectedGrade = gradeSelect.value;
+                if (selectedGrade !== 'custom') {
+                    hourlyRateInput.value = GRADE_HOURLY_RATES[selectedGrade].toFixed(2);
+                }
+                // If 'custom' is selected, the user can manually enter the rate.
+            }
+
+            /**
+             * Calculates all pay and leave statistics based on input hours.
+             */
+            function calculatePay() {
+                const hourlyRate = parseFloat(hourlyRateInput.value) || 0;
+                const claimTaxFree = taxFreeThresholdCheckbox.checked;
+                const icareRate = parseFloat(icareRateInput.value) / 100 || 0;
+                const sleepoverAllowance = parseFloat(sleepoverAllowanceInput.value) || 0;
+
+                let totalNormalHours = 0;
+                let totalAfternoonHours = 0;
+                let totalNightHours = 0;
+                let totalSaturdayHours = 0;
+                let totalSundayHours = 0;
+                let totalSleepoversCount = 0; // New variable for total sleepover instances
+                let totalHoursWorked = 0; // This will only include actual working hours, not sleepover allowance hours
+
+                let grossPayNormal = 0;
+                let grossPayAfternoon = 0;
+                let grossPayNight = 0;
+                let grossPaySaturday = 0;
+                let grossPaySunday = 0;
+                let grossPaySleepovers = 0; // New variable for sleepover allowance earnings
+
+                // Process Monday to Friday hours and sleepovers
+                const daysOfWeek = ['mon', 'tue', 'wed', 'thu', 'fri'];
+                daysOfWeek.forEach(day => {
+                    const normalHrs = parseFloat(document.getElementById(`${day}Normal`).value) || 0;
+                    const afternoonHrs = parseFloat(document.getElementById(`${day}Afternoon`).value) || 0;
+                    const nightHrs = parseFloat(document.getElementById(`${day}Night`).value) || 0;
+                    const sleepoverCount = parseFloat(document.getElementById(`${day}Sleepover`).value) || 0;
+
+                    totalNormalHours += normalHrs;
+                    totalAfternoonHours += afternoonHrs;
+                    totalNightHours += nightHrs;
+                    totalSleepoversCount += sleepoverCount;
+
+                    grossPayNormal += normalHrs * hourlyRate * AWARD_RATES.NORMAL_LOADING;
+                    grossPayAfternoon += afternoonHrs * hourlyRate * AWARD_RATES.AFTERNOON_LOADING;
+                    grossPayNight += nightHrs * hourlyRate * AWARD_RATES.NIGHT_LOADING;
+                    grossPaySleepovers += sleepoverCount * sleepoverAllowance;
+                });
+
+                // Process Saturday hours and sleepovers
+                const satHrs = parseFloat(document.getElementById('satHours').value) || 0;
+                const satSleepoverCount = parseFloat(document.getElementById('satSleepover').value) || 0;
+                totalSaturdayHours += satHrs;
+                totalSleepoversCount += satSleepoverCount;
+                grossPaySaturday += satHrs * hourlyRate * AWARD_RATES.SATURDAY_LOADING;
+                grossPaySleepovers += satSleepoverCount * sleepoverAllowance;
+
+                // Process Sunday hours and sleepovers
+                const sunHrs = parseFloat(document.getElementById('sunHours').value) || 0;
+                const sunSleepoverCount = parseFloat(document.getElementById('sunSleepover').value) || 0;
+                totalSundayHours += sunHrs;
+                totalSleepoversCount += sunSleepoverCount;
+                grossPaySunday += sunHrs * hourlyRate * AWARD_RATES.SUNDAY_LOADING;
+                grossPaySleepovers += sunSleepoverCount * sleepoverAllowance;
+
+                // Calculate total hours worked (excluding sleepover allowance as it's not "working hours" for leave accrual)
+                totalHoursWorked = totalNormalHours + totalAfternoonHours + totalNightHours + totalSaturdayHours + totalSundayHours;
+
+                // Calculate total gross pay (including sleepover allowances)
+                const fortnightlyGrossPay = grossPayNormal + grossPayAfternoon + grossPayNight + grossPaySaturday + grossPaySunday + grossPaySleepovers;
+
+                // Calculate superannuation (OTE generally includes ordinary hours, shift loadings, but usually not allowances like sleepovers unless specified by award/agreement)
+                // For simplicity here, OTE is considered the total gross pay from ordinary and shift-loaded hours, *excluding* sleepover allowance for super calculation.
+                const superableGrossPay = fortnightlyGrossPay - grossPaySleepovers;
+                const fortnightlySuper = superableGrossPay * SUPER_RATE;
+
+                // Calculate tax using the new function
+                const fortnightlyTax = calculatePAYGTax(fortnightlyGrossPay, claimTaxFree);
+
+                // Calculate ICARE (employer cost, but shown as a calculated value)
+                const fortnightlyIcare = fortnightlyGrossPay * icareRate;
+
+                // Calculate net pay
+                const fortnightlyNetPay = fortnightlyGrossPay - fortnightlyTax;
+
+                // Calculate Total Employer Cost (Gross Pay + Super + ICARE)
+                const totalEmployerCost = fortnightlyGrossPay + fortnightlySuper + fortnightlyIcare;
+
+                // Calculate leave accruals (pro-rata based on total *working* hours vs. full-time hours)
+                const proportionOfFullTime = totalHoursWorked / STANDARD_FULL_TIME_HOURS_PER_FORTNIGHT;
+                const annualLeaveAccrual = (ANNUAL_LEAVE_ACCRUAL_RATE_FULL_TIME_HOURS_PER_YEAR / 26) * proportionOfFullTime; // Per fortnight
+                const sickLeaveAccrual = (SICK_LEAVE_ACCRUAL_RATE_FULL_TIME_HOURS_PER_YEAR / 26) * proportionOfFullTime;   // Per fortnight
+
+                // Calculate Accrued Annual Leave Cost
+                const annualLeaveCost = annualLeaveAccrual * hourlyRate;
+
+                // Display results
+                outputElements.fortnightlyGrossPay.textContent = `$${fortnightlyGrossPay.toFixed(2)}`;
+                outputElements.fortnightlyTax.textContent = `$${fortnightlyTax.toFixed(2)}`;
+                outputElements.fortnightlySuper.textContent = `$${fortnightlySuper.toFixed(2)}`;
+                outputElements.fortnightlyNetPay.textContent = `$${fortnightlyNetPay.toFixed(2)}`;
+                outputElements.fortnightlyIcare.textContent = `$${fortnightlyIcare.toFixed(2)}`;
+                outputElements.totalEmployerCost.textContent = `$${totalEmployerCost.toFixed(2)}`;
+                outputElements.annualLeaveAccrual.textContent = annualLeaveAccrual.toFixed(2);
+                outputElements.annualLeaveCost.textContent = `$${annualLeaveCost.toFixed(2)}`;
+                outputElements.sickLeaveAccrual.textContent = sickLeaveAccrual.toFixed(2);
+                outputElements.totalNormalHours.textContent = totalNormalHours.toFixed(2);
+                outputElements.totalAfternoonHours.textContent = totalAfternoonHours.toFixed(2);
+                outputElements.totalNightHours.textContent = totalNightHours.toFixed(2);
+                outputElements.totalSaturdayHours.textContent = totalSaturdayHours.toFixed(2);
+                outputElements.totalSundayHours.textContent = totalSundayHours.toFixed(2);
+                outputElements.totalSleepovers.textContent = totalSleepoversCount;
+                outputElements.totalHoursWorked.textContent = totalHoursWorked.toFixed(2);
+            }
+
+            /**
+             * Clears all input fields and resets output values.
+             */
+            function clearForm() {
+                gradeSelect.value = 'custom';
+                hourlyRateInput.value = '25.00';
+                taxFreeThresholdCheckbox.checked = true; // Default to claiming tax-free threshold
+                icareRateInput.value = '1.5';
+                sleepoverAllowanceInput.value = '56.00'; // Default sleepover allowance
+
+                dayInputs.forEach(input => {
+                    input.value = '0';
+                });
+
+                for (const key in outputElements) {
+                    if (outputElements.hasOwnProperty(key)) {
+                        // Special handling for totalSleepovers which is a count, not currency
+                        if (key === 'totalSleepovers') {
+                            outputElements[key].textContent = '0';
+                        } else if (key.includes('Cost') || key.includes('Pay') || key.includes('Super') || key.includes('Icare')) {
+                            outputElements[key].textContent = '$0.00';
+                        } else {
+                            outputElements[key].textContent = '0.00';
+                        }
+                    }
+                }
+            }
+
+            // Event Listeners
+            calculateBtn.addEventListener('click', calculatePay);
+            clearBtn.addEventListener('click', clearForm);
+            gradeSelect.addEventListener('change', updateHourlyRateFromGrade);
+            taxFreeThresholdCheckbox.addEventListener('change', calculatePay); // Recalculate tax when checkbox changes
+            sleepoverAllowanceInput.addEventListener('input', calculatePay); // Recalculate when allowance changes
+
+            // Add event listeners to all day input fields for real-time updates
+            dayInputs.forEach(input => {
+                input.addEventListener('input', calculatePay);
+            });
+
+
+            // Initial calculation on load with default values
+            updateHourlyRateFromGrade(); // Set initial hourly rate based on default grade selection
+            calculatePay();
+        });
+    </script>
+</body>
+</html>
