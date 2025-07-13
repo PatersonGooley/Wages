@@ -50,7 +50,7 @@
             font-weight: 600; /* Slightly bolder labels */
             color: #4a5568;
         }
-        .input-group input[type="number"], .input-group select {
+        .input-group input[type="number"], .input-group select, .input-group input[type="text"] { /* Added type="text" */
             padding: 12px 16px; /* More padding */
             border: 1px solid #cbd5e0; /* Lighter border */
             border-radius: 10px; /* More rounded */
@@ -61,7 +61,7 @@
             -moz-appearance: none; /* For consistent styling on Firefox */
             appearance: none;
         }
-        .input-group input[type="number"]:focus, .input-group select:focus {
+        .input-group input[type="number"]:focus, .input-group select:focus, .input-group input[type="text"]:focus { /* Added type="text" */
             outline: none;
             border-color: #4299e1; /* Brighter blue on focus */
             box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.4); /* More prominent shadow on focus */
@@ -261,6 +261,10 @@
 
         <div class="input-section">
             <div class="input-group">
+                <label for="groupHomeAddress">Group Home Address:</label>
+                <input type="text" id="groupHomeAddress" placeholder="Enter address">
+            </div>
+            <div class="input-group">
                 <label for="gradeSelect">Select Grade/Classification:</label>
                 <select id="gradeSelect">
                     <option value="custom">Custom Rate</option>
@@ -453,6 +457,7 @@
             // Changed ID from calculateBtn to exportPdfBtn
             const exportPdfBtn = document.getElementById('exportPdfBtn');
             const clearBtn = document.getElementById('clearBtn');
+            const groupHomeAddressInput = document.getElementById('groupHomeAddress'); // New input
             const gradeSelect = document.getElementById('gradeSelect');
             const hourlyRateInput = document.getElementById('hourlyRate');
             const taxFreeThresholdCheckbox = document.getElementById('taxFreeThreshold');
@@ -467,7 +472,7 @@
                 'thuNormal', 'thuAfternoon', 'thuNight', 'thuSleepover',
                 'friNormal', 'friAfternoon', 'friNight', 'friSleepover',
                 'satHours', 'satSleepover',
-                'sunHours', 'sunSleepover' // Removed sunAfternoon and sunNight
+                'sunHours', 'sunSleepover'
             ].map(id => document.getElementById(id));
 
             // Output elements
@@ -688,6 +693,7 @@
              * Clears all input fields and resets output values.
              */
             function clearForm() {
+                groupHomeAddressInput.value = ''; // Clear new input field
                 gradeSelect.value = 'custom';
                 hourlyRateInput.value = '25.00';
                 taxFreeThresholdCheckbox.checked = true; // Default to claiming tax-free threshold
@@ -738,6 +744,8 @@
                 doc.text("Input Parameters:", margin, yPos);
                 yPos += lineHeight;
                 doc.setFontSize(contentFontSize);
+                doc.text(`Group Home Address: ${groupHomeAddressInput.value || 'N/A'}`, margin, yPos); // Added to PDF
+                yPos += lineHeight;
                 doc.text(`Grade/Classification: ${gradeSelect.options[gradeSelect.selectedIndex].text}`, margin, yPos);
                 yPos += lineHeight;
                 doc.text(`Base Hourly Rate: ${hourlyRateInput.value ? `$${parseFloat(hourlyRateInput.value).toFixed(2)}` : '$0.00'}`, margin, yPos);
@@ -818,13 +826,13 @@
             }
 
             // Event Listeners
-            exportPdfBtn.addEventListener('click', exportPdf); // Changed to exportPdf
+            exportPdfBtn.addEventListener('click', exportPdf);
             clearBtn.addEventListener('click', clearForm);
             gradeSelect.addEventListener('change', updateHourlyRateFromGrade);
-            taxFreeThresholdCheckbox.addEventListener('change', calculatePay); // Recalculate tax when checkbox changes
-            icareRateInput.addEventListener('input', calculatePay); // Recalculate when allowance changes
-            sleepoverAllowanceInput.addEventListener('input', calculatePay); // Recalculate when allowance changes
-
+            taxFreeThresholdCheckbox.addEventListener('change', calculatePay);
+            icareRateInput.addEventListener('input', calculatePay);
+            sleepoverAllowanceInput.addEventListener('input', calculatePay);
+            groupHomeAddressInput.addEventListener('input', calculatePay); // Add event listener for new input
 
             // Add event listeners to all day input fields for real-time updates
             dayInputs.forEach(input => {
